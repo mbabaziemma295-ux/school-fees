@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>School Fees Management System</title>
+<style>
+/* BODY WITH WALLPAPER */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-image: url('rutwe.jpeg'); /* Wallpaper image */
+  background-size: cover;              /* Cover entire screen */
+  background-position: center;         /* Centered */
+  background-repeat: no-repeat;        /* Do not repeat */
+  background-attachment: fixed;        /* Wallpaper idahinduka igihe uscroll */
+  color: color;
+  position: relative;
+}
+
+/* Overlay kugirango text igaragare neza kuri wallpaper */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3); /* Umukara woroheje ku ifoto */
+  z-index: -1; /* Shyira inyuma */
+}
+
+/* HEADER */
+h2{
+  text-align:center;
+  color:#fff;
+  text-shadow: 2px 2px 4px #1ef9f52c;
+  margin-bottom:20px;
+}
+
+/* Layout */
+.container{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+/* MAIN CONTENT */
+.main{flex:2}
+
+.form-box{
+  background: rgba(140, 150, 208, 0.87); /* transparent white */
+  padding:10px;
+  border-radius:1px;
+  box-shadow:0 0 10px rgba(83, 87, 195, 0.29);
+}
+
+input, select, button{
+  width:55%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:1px;
+  border:10px solid 92#9297dc97;
+}
+
+button{
+  background: rgba(84,77,184,0.85);
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+
+button:hover{
+  background:gray;
+}
+
+/* Table */
+table{
+  width:60%;
+  border-collapse:collapse;
+  margin-top:2px;
+  background: rgba(87, 82, 152, 0.85); /* transparent table */
+  border-radius:8px;
+  overflow:hidden;
+}
+
+th, td{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+}
+
+th{
+  background:#3d0909;
+  color:#fff;
+}
+
+/* STATUS COLORS */
+.nopayment{color:rgb(224, 109, 15);font-weight:bold}
+.pending{color:red;font-weight:bold}
+.full{color:green;font-weight:bold}
+.excess{color:blue;font-weight:bold}
+
+/* HISTORY SIDEBAR */
+.history{
+  flex:1;
+  background: rgba(165, 170, 134, 0.85); /* transparent white */
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 0 10px rgba(0,0,0,.3);
+  max-height:500px;
+  overflow-y:auto;
+}
+
+.history h3{
+  text-align:center;
+  color:#3d0909;
+}
+
+.history ul{
+  list-style:none;
+  padding:0;
+}
+
+.history li{
+  border-bottom:1px solid #eeeeee25;
+  padding:8px 0;
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<h2>School Fees Management System</h2>
+
+<div class="container">
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="form-box">
+      <input type="text" id="name" placeholder="Trainee Name">
+      <select id="program">
+        <option value="">Select Program</option>
+        <option value="Tourism">Tourism</option>
+        <option value="Software Development">Software Development</option>
+        <option value="Electricity">Electricity</option>
+        <option value="Food and Beverage">Food and Beverage</option>
+        <option value="Accounting">Accounting</option>
+        <option value="Building and Contraction">Building and Contraction</option>
+        <option value="Automobile">Automobile</option>
+      </select>
+      <input type="number" id="paid" placeholder="Amount Paid (RWF)">
+      <button onclick="addStudent()">Save Payment</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Program</th>
+          <th>Fees</th>
+          <th>Paid</th>
+          <th>Balance</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- HISTORY SIDEBAR -->
+  <aside class="history">
+    <h3>Payment History</h3>
+    <ul id="historyList"></ul>
+  </aside>
+
+</div>
+
+<script>
+let students = [];   // Table nyamukuru
+let history = [];    // History sidebar
+
+function addStudent(){
+ let name = document.getElementById("name").value;
+ let program = document.getElementById("program").value;
+ let paid = Number(document.getElementById("paid").value);
+
+ if(name=="" || program=="" || paid<0){
+   alert("Fill all fields");
+   return;
+ }
+
+ let fees = 0;
+ if(program=="Tourism") fees=100000;
+ else if(program=="Software Development") fees=130000;
+ else if(program=="Electricity") fees=140000;
+ else if(program=="Food and Beverage") fees=150000;
+ else if(program=="Accounting") fees=120000;
+ else if(program=="building and Contraction") fees=1700;
+ else if(program=="Automobile") fees=180000;
+
+ let balance = fees - paid;
+ let status="", cls="";
+
+ if(paid==0){status="No Payment"; cls="nopayment";}
+ else if(paid<fees){status="Pending Payment"; cls="pending";}
+ else if(paid==fees){status="Paid in Full"; cls="full";}
+ else{status="Excess Payment"; cls="excess";}
+
+ // Table nyamukuru: gusa uwo winjije ubu
+ students = [{name,program,fees,paid,balance,status,cls}];
+ display();
+
+ // History: ikomeza kongera, byose bihora bigaragara
+ history.push({name,program,paid,balance,status,cls,date:new Date().toLocaleString()});
+ displayHistory();
+
+ // Clear form
+ document.getElementById("name").value="";
+ document.getElementById("program").value="";
+ document.getElementById("paid").value="";
+}
+
+function display(){
+ let tbody = document.getElementById("tbody");
+ tbody.innerHTML="";
+ students.forEach(s=>{
+   tbody.innerHTML+=`
+   <tr>
+     <td>${s.name}</td>
+     <td>${s.program}</td>
+     <td>${s.fees}</td>
+     <td>${s.paid}</td>
+     <td>${s.balance}</td>
+     <td class="${s.cls}">${s.status}</td>
+   </tr>`;
+ });
+}
+
+function displayHistory(){
+ let list = document.getElementById("historyList");
+ list.innerHTML="";
+ history.slice().reverse().forEach(h=>{
+   list.innerHTML+=`
+   <li>
+     <strong>${h.name}</strong><br>
+     ${h.program}<br>
+     Paid: ${h.paid} RWF<br>
+     Balance: ${h.balance} RWF<br>
+     <span class="${h.cls}">${h.status}</span><br>
+     <small>${h.date}</small>
+   </li>`;
+ });
+}
+</script>
+
+</body>
+</html>
